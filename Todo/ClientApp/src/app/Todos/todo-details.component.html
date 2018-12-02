@@ -1,3 +1,40 @@
-<p>
-  todo-details works!
-</p>
+<div>
+  <div *ngIf="todoKey > 0">
+    <h1><span class="label label-default">Updating Todo</span></h1>
+  </div>
+  <div *ngIf="todoKey == 0">
+    <h1><span class="label label-default">New Todo</span></h1>
+  </div>
+</div>
+
+<div style="margin-top: 30px;">
+  <div>
+    <form [formGroup]="todoForm">
+      <label for="todoName">Todo Name</label>
+      <input class="form-control" formControlName="todoName" placeholder="Name your todo..." />
+    </form>
+  </div>
+
+  <div style="margin-top:20px;">
+    
+    <dx-data-grid [dataSource]="taskList"
+                  (onToolbarPreparing)="customizeToolbar($event)">
+      <dxo-editing mode="batch"
+                   [allowUpdating]="true"
+                   [allowAdding]="true"
+                   [allowDeleting]="true">
+                  </dxo-editing>
+
+      <div *dxTemplate="let data of 'listLabel'">
+        <div class="informer">
+          <span class="taskListTitle">Task list</span>
+        </div>
+      </div>
+
+    </dx-data-grid>
+  </div>
+  <div>
+    <button class="btn btn-primary" (click)="saveTodo()">Save</button>
+    <button class="btn btn-danger" (click)="cancelAndGoBackToList()">Cancel</button>
+  </div>
+</div>

@@ -21,7 +21,6 @@ export class TodoListComponent implements OnInit {
   ngOnInit(): void {
     this.todosService.getTodos().subscribe(res => {
       this.todosList = res;
-      console.log(this.todosList);
     }, err => {
       console.log('there was an error reaching API', err);
     });
@@ -29,11 +28,11 @@ export class TodoListComponent implements OnInit {
 
   editTodo(e: any) {
     this.router.navigate(['/Todos/', e.data.todoKey]);
-    console.log(e);
   }
 
   createNewTodo() {
-
+    this.router.navigate(['/Todos/',0]);
   }
 
+  
 }

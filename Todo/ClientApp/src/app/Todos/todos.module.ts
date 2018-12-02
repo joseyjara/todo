@@ -1,10 +1,11 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute } from '@angular/router';
-import { DxDataGridModule } from 'devextreme-angular';
+import { DxDataGridModule, DxButtonModule } from 'devextreme-angular';
 import { TodoDetailsComponent } from './todo-details.component';
 import { TodoListComponent } from './todo-list.component';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -13,6 +14,10 @@ import { TodoListComponent } from './todo-list.component';
   ],
   imports: [
     DxDataGridModule,
+    DxButtonModule,
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
     RouterModule.forChild([
       { path: '', component: TodoListComponent },
       { path: ':todoKey', component: TodoDetailsComponent }      
@@ -24,10 +29,10 @@ import { TodoListComponent } from './todo-list.component';
   bootstrap: []
 })
 export class TodosModule {
-  todoKey = 0;
-  constructor(private route: ActivatedRoute) {
-    this.route.params.subscribe(params => this.todoKey = params['todoKey']);
-  }
+  //todoKey = 0;
+  //constructor(private route: ActivatedRoute) {
+  //  this.route.params.subscribe(params => this.todoKey = params['todoKey']);
+  //}
 }
 
 

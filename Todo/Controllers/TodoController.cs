@@ -17,6 +17,28 @@ namespace Todo.Controllers
             new Todo { todoKey = 3, name = "Workouts" },
             new Todo { todoKey = 4, name = "Books to read" }
         };
+
+
+        private TodoTask[] listOfTasks =
+            {
+            new TodoTask {TaskKey = 1, TodoKey=1,TaskName="lettuce", Completed=false },
+            new TodoTask {TaskKey = 2, TodoKey=1,TaskName="Tomatoes", Completed=false },
+            new TodoTask {TaskKey = 3, TodoKey=1,TaskName="Peppers", Completed=false },
+            new TodoTask {TaskKey = 4, TodoKey=1,TaskName="Pineapple", Completed=false },
+            new TodoTask {TaskKey = 5, TodoKey=1,TaskName="Milk", Completed=false },
+            new TodoTask {TaskKey = 6, TodoKey=2,TaskName="Master bathroom sink", Completed=false },
+            new TodoTask {TaskKey = 7, TodoKey=2,TaskName="Kitchen sink", Completed=false },
+            new TodoTask {TaskKey = 8, TodoKey=2,TaskName="Buy kitchen faucet", Completed=false },
+            new TodoTask {TaskKey = 9, TodoKey=2,TaskName="Re-do deck", Completed=false },
+            new TodoTask {TaskKey = 10, TodoKey=3,TaskName="Chest", Completed=false },
+            new TodoTask {TaskKey = 11, TodoKey=3,TaskName="Biceps", Completed=false },
+            new TodoTask {TaskKey = 12, TodoKey=3,TaskName="Shoulders", Completed=false },
+            new TodoTask {TaskKey = 13, TodoKey=3,TaskName="Triceps", Completed=false },
+            new TodoTask {TaskKey = 14, TodoKey=4,TaskName="C# for dummies", Completed=false },
+            new TodoTask {TaskKey = 15, TodoKey=4,TaskName="Typescript for dummies", Completed=false },
+        };
+
+
     
         // GET: Todo
         [HttpGet("[action]")]
@@ -27,9 +49,18 @@ namespace Todo.Controllers
 
         #region unimplemented methods
         // GET: Todo/Details/5
-        public ActionResult Details(int id)
+        [HttpGet("[action]")]
+        public Todo GetTodoDetails(int todoKey)
         {
-            return View();
+            var todoDetails = listOfTodos.First(x => x.todoKey == todoKey);
+            return todoDetails;
+        }
+
+        [HttpGet("[action]")]
+        public IEnumerable<TodoTask> GetTodoTasks(int todoKey)
+        {
+            var taskListForTodo = listOfTasks.Where(x => x.TodoKey == todoKey);
+            return taskListForTodo;
         }
 
         // POST: Todo/Create
@@ -84,5 +115,13 @@ namespace Todo.Controllers
     {
         public int todoKey { get; set; }
         public string name { get; set; }
+    }
+
+    public class TodoTask
+    {
+        public int TaskKey { get; set; }
+        public int TodoKey { get; set; }
+        public string TaskName { get; set; }
+        public bool Completed { get; set; }
     }
 }
