@@ -1,25 +1,12 @@
-import { Component, OnInit } from '@angular/core';
-import { DxDataGridComponent } from 'devextreme-angular'
-import { TodosService } from '../services/todos.service';
-
+import { Component } from '@angular/core'
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'todos',
-  templateUrl: './todos.component.html',
-  styleUrls: ['./todos.component.css']
+  styleUrls: ['./todos.component.css'],
+  templateUrl: './todos.component.html'
 })
 
-export class TodosComponent implements OnInit {
-
-  constructor(private todosService: TodosService) {
-
-  }
-
-  todosList: any;
-
-  ngOnInit(): void {
-    this.todosList = this.todosService.getTodos();
-    console.log(this.todosList);
-    }
-
+export class TodosComponent {
+  constructor(private route: ActivatedRoute) {}
 }

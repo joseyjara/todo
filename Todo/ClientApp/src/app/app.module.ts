@@ -9,10 +9,10 @@ import { NavMenuComponent } from './nav-menu/nav-menu.component';
 import { HomeComponent } from './home/home.component';
 import { CounterComponent } from './counter/counter.component';
 import { FetchDataComponent } from './fetch-data/fetch-data.component';
-import { TodosComponent } from './Todos/todos.component';
 
 import { DxDataGridModule } from 'devextreme-angular';
 import { TodosService } from './services/todos.service';
+import { TodosComponent } from './Todos/todos.component';
 
 @NgModule({
   declarations: [
@@ -32,7 +32,11 @@ import { TodosService } from './services/todos.service';
       { path: '', component: HomeComponent, pathMatch: 'full' },
       { path: 'counter', component: CounterComponent },
       { path: 'fetch-data', component: FetchDataComponent },
-      { path: 'todos', component: TodosComponent }
+      {
+        path: 'Todos', component: TodosComponent, children: [
+          { path: '', loadChildren: './Todos/todos.module#TodosModule' }
+        ]
+      }
     ])
   ],
   providers: [TodosService],

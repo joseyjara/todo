@@ -1,21 +1,14 @@
-import { Inject } from '@angular/core'
+import { Inject, Injectable } from '@angular/core'
 import { HttpClient, HttpHeaders, HttpParams, HttpResponse, HttpHeaderResponse } from '@angular/common/http';
+import { Observable } from 'rxjs/Observable';
 
+@Injectable()
 export class TodosService {
-
-  private headers: HttpHeaders;
 
   constructor(private http: HttpClient, @Inject('BASE_URL') private baseUrl: string) {
   }
 
-  tempTodos = [
-    { 'todoKey': 1, 'name': 'Groceries' },
-    { 'todoKey': 2, 'name': 'Home Repairs' },
-    { 'todoKey': 3, 'name': 'Workouts' },
-    { 'todoKey': 4, 'name': 'Books to read' }];
-
-
-  tempTodosItems = [
+   tempTodosItems = [
     { 'itemNumber': 1, 'todoKey': 1, 'itemName': 'Lettuce' },
     { 'itemNumber': 2, 'todoKey': 1, 'itemName': 'Tomatoes' },
     { 'itemNumber': 3, 'todoKey': 1, 'itemName': 'Peppers' },
@@ -35,13 +28,19 @@ export class TodosService {
 
 
 
-  getTodos() {
-    this.http.get<Todos[]>(this.baseUrl + 'api/')
-    return this.tempTodos;
+  getTodos(): Observable<Todo[]> {
+    var todos = this.http.get<Todo[]>(this.baseUrl + 'api/Todo/GetTodos');
+    return todos;
   }
 
   getTodosItems() {
     return this.tempTodosItems;
   }
 
+}
+
+
+interface Todo {
+  todoKey: number;
+  name: string;
 }

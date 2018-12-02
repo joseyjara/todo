@@ -1,0 +1,22 @@
+<div>
+  <h1>Todos!</h1>
+</div>
+
+<div>
+  <button class="btn btn-primary" (click)="createNewTodo()">Add new Todo</button>
+  <dx-data-grid [dataSource]="todosList"
+                keyExpr="todoKey"
+                [searchPanel]="{visible: true}"
+                [showColumnLines]="true"
+                [showRowLines]="true"
+                [hoverStateEnabled]="true"
+                (onRowClick)="editTodo($event)">
+    <dxo-editing mode="row"
+                 [allowDeleting]="true"
+                 [useIcons]="true">
+
+    </dxo-editing>
+    <dxi-column alignment="left" dataType="string" dataField="name" caption="Todo Name"></dxi-column>
+  </dx-data-grid>
+</div>
+<router-outlet></router-outlet>

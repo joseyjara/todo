@@ -1,18 +1,1 @@
-<div>
-  <h1>Todos!</h1>
-</div>
-
-<div>
-  <dx-data-grid [dataSource]="todosList" keyExpr="todoId" [searchPanel]="{visible: true}" [showColumnLines]="true"
-                [showRowLines]="true" [allowColumnResizing]="true" [hoverStateEnabled]="true">
-    <dxo-editing mode="row"
-                 [allowUpdating]="true"
-                 [allowDeleting]="true"
-                 [allowAdding]="true"
-                 [useIcons]="true">
-
-    </dxo-editing>
-    <dxi-column alignment="left" dataType="number" dataField="todoId" caption="Todo #"></dxi-column>
-    <dxi-column alignment="left" dataType="string" dataField="name" caption="Todo Name"></dxi-column>
-  </dx-data-grid>
-</div>
+<router-outlet></router-outlet>
