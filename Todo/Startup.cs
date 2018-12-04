@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SpaServices.AngularCli;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+//using EFGetStarted.AspNetCore.ExistingDb.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Todo
 {
@@ -20,6 +22,9 @@ namespace Todo
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            var connection = @"Server=(local)\;Database=Todo;Trusted_Connection=false;ConnectRetryCount=0;User ID=sa;Password=qams9350!";
+            services.AddDbContext<Todo.Models.TodoContext>(options => options.UseSqlServer(connection));
 
             // In production, the Angular files will be served from this directory
             services.AddSpaStaticFiles(configuration =>

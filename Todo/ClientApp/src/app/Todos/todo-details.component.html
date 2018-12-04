@@ -10,20 +10,33 @@
 <div style="margin-top: 30px;">
   <div>
     <form [formGroup]="todoForm">
-      <label for="todoName">Todo Name</label>
-      <input class="form-control" formControlName="todoName" placeholder="Name your todo..." />
+      <label for="todoName">To-do</label>
+      <input [ngClass]="{'invalid': !formValid}" class="form-control" formControlName="todoListName" placeholder="Name your to-do list..." />
     </form>
   </div>
 
   <div style="margin-top:20px;">
     
-    <dx-data-grid [dataSource]="taskList"
-                  (onToolbarPreparing)="customizeToolbar($event)">
+    <dx-data-grid #tasksGrid [dataSource]="taskList"
+                  keyExpr="taskKey"
+                  (onToolbarPreparing)="customizeToolbar($event)"
+                  [showRowLines]="true"
+                  [searchPanel]="{visible: true}"
+                  (onRowInserting)="rowInserting($event)"
+                  (onRowInserted)="rowInserted($event)"
+                  (onRowUpdating)="rowUpdating($event)"
+                  (onRowUpdated)="rowUpdated($event)"
+                  (onRowRemoving)="rowRemoving($event)"
+                  (onRowRemoved)="rowRemoved($event)"
+                  (onContentReady)="todoContentReady($event)"
+                  (onInitNewRow)="onInitNewTaskRow($event)"
+                  >
       <dxo-editing mode="batch"
                    [allowUpdating]="true"
                    [allowAdding]="true"
-                   [allowDeleting]="true">
-                  </dxo-editing>
+                   [allowDeleting]="true"
+                   [useIcons]="true">
+      </dxo-editing>
 
       <div *dxTemplate="let data of 'listLabel'">
         <div class="informer">
@@ -31,9 +44,13 @@
         </div>
       </div>
 
+      <dxi-column dataType="number" dataField="taskKey" [visible]="false"></dxi-column>
+      <dxi-column alignment="left" dataType="string" dataField="taskDescription" caption="Task"></dxi-column>
+      <dxi-column alignment="center" dataType="boolean" dataField="completed" caption="Completed"></dxi-column>
+
     </dx-data-grid>
   </div>
-  <div>
+  <div style="margin-top:10px;">
     <button class="btn btn-primary" (click)="saveTodo()">Save</button>
     <button class="btn btn-danger" (click)="cancelAndGoBackToList()">Cancel</button>
   </div>

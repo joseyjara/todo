@@ -17,9 +17,27 @@ export class TodoListComponent implements OnInit {
   }
 
   todosList: any;
+  isToastVisible: boolean = false;
+
+  deleteTask(e: any) {
+    this.isToastVisible = true;
+    if (e.key) {
+      const deleteTodoSub = this.todosService.deleteTodo(e.key).subscribe(res => {
+        
+      }, err => {
+        //handle error
+        console.log('unable to delete', err);
+      }, () => {
+        if (deleteTodoSub)
+          deleteTodoSub.unsubscribe();
+        console.log(this.isToastVisible);
+      });
+    }
+  }
 
   ngOnInit(): void {
     this.todosService.getTodos().subscribe(res => {
+      console.log(res);
       this.todosList = res;
     }, err => {
       console.log('there was an error reaching API', err);

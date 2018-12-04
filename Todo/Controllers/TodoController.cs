@@ -4,80 +4,187 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.JsonPatch;
+using Todo.Models;
+using Newtonsoft.Json;
 
 namespace Todo.Controllers
 {
     [Route("api/[controller]")]
     public class TodoController : Controller
     {
-        private Todo[] listOfTodos =
-            {
-            new Todo { todoKey = 1, name = "Groceries"},
-            new Todo { todoKey = 2, name = "Home Repairs" },
-            new Todo { todoKey = 3, name = "Workouts" },
-            new Todo { todoKey = 4, name = "Books to read" }
-        };
-
-
-        private TodoTask[] listOfTasks =
-            {
-            new TodoTask {TaskKey = 1, TodoKey=1,TaskName="lettuce", Completed=false },
-            new TodoTask {TaskKey = 2, TodoKey=1,TaskName="Tomatoes", Completed=false },
-            new TodoTask {TaskKey = 3, TodoKey=1,TaskName="Peppers", Completed=false },
-            new TodoTask {TaskKey = 4, TodoKey=1,TaskName="Pineapple", Completed=false },
-            new TodoTask {TaskKey = 5, TodoKey=1,TaskName="Milk", Completed=false },
-            new TodoTask {TaskKey = 6, TodoKey=2,TaskName="Master bathroom sink", Completed=false },
-            new TodoTask {TaskKey = 7, TodoKey=2,TaskName="Kitchen sink", Completed=false },
-            new TodoTask {TaskKey = 8, TodoKey=2,TaskName="Buy kitchen faucet", Completed=false },
-            new TodoTask {TaskKey = 9, TodoKey=2,TaskName="Re-do deck", Completed=false },
-            new TodoTask {TaskKey = 10, TodoKey=3,TaskName="Chest", Completed=false },
-            new TodoTask {TaskKey = 11, TodoKey=3,TaskName="Biceps", Completed=false },
-            new TodoTask {TaskKey = 12, TodoKey=3,TaskName="Shoulders", Completed=false },
-            new TodoTask {TaskKey = 13, TodoKey=3,TaskName="Triceps", Completed=false },
-            new TodoTask {TaskKey = 14, TodoKey=4,TaskName="C# for dummies", Completed=false },
-            new TodoTask {TaskKey = 15, TodoKey=4,TaskName="Typescript for dummies", Completed=false },
-        };
-
-
-    
-        // GET: Todo
-        [HttpGet("[action]")]
-        public IEnumerable<Todo> GetTodos()
+        private readonly TodoContext _context;
+        public TodoController(TodoContext context)
         {
-            return listOfTodos;
+            _context = context;
         }
 
-        #region unimplemented methods
-        // GET: Todo/Details/5
         [HttpGet("[action]")]
-        public Todo GetTodoDetails(int todoKey)
+        public IEnumerable<Todos> GetTodos()
         {
-            var todoDetails = listOfTodos.First(x => x.todoKey == todoKey);
+            var todoList = _context.Todos;
+            return todoList;
+        }
+
+        [HttpGet("[action]")]
+        public Todos GetTodoDetails(int todoKey)
+        {
+            var todoDetails = _context.Todos.First(x => x.TodoKey == todoKey);
             return todoDetails;
         }
 
         [HttpGet("[action]")]
-        public IEnumerable<TodoTask> GetTodoTasks(int todoKey)
+        public IEnumerable<Tasks> GetTodoTasks(int todoKey)
         {
-            var taskListForTodo = listOfTasks.Where(x => x.TodoKey == todoKey);
-            return taskListForTodo;
+            var taskList = _context.Tasks.Where(x => x.TodoKey == todoKey).ToList();
+            return taskList;
         }
 
-        // POST: Todo/Create
-        [HttpPost("[action]")]
-        public ActionResult Create(IFormCollection collection)
+        [HttpPatch("[action]")]
+        public ActionResult UpdateTodo(int todoKey, [FromBody]JsonPatchDocument<Todos> data)
         {
+            var todoToUpdate = _context.Todos.First(x => x.TodoKey == todoKey);
+            data.ApplyTo(todoToUpdate);
             try
             {
-                // TODO: Add insert logic here
-
-                return RedirectToAction();
-            }
-            catch
+                _context.SaveChanges();
+            }catch(Exception ex)
             {
-                return View();
+                return StatusCode(StatusCodes.Status400BadRequest, ex.Message);
             }
+            return Ok();
         }
+
+        [HttpPost("[action]")]
+        public ActionResult SaveTasksBatch([FromBody]TasksBatch taskBatch, int todoKey)
+        {
+            string errors = string.Empty;
+            if(taskBatch != null)
+            {
+                if(taskBatch.TasksKeysToDelete != null && taskBatch.TasksKeysToDelete.Count > 0)
+                {
+                    foreach(var taskKeyToDelete in taskBatch.TasksKeysToDelete)
+                    {
+                        try
+                        {
+                            var taskToDelete = _context.Tasks.FirstOrDefault(x => x.TaskKey == taskKeyToDelete);
+                            if(taskToDelete != null)
+                            {
+                                _context.Remove(taskToDelete);
+                            }
+                        }catch(Exception ex)
+                        {
+                            errors += " " + ex.Message + ";";
+                        }
+                    }
+                }
+                if(taskBatch.TasksToCreate != null && taskBatch.TasksToCreate.Count > 0)
+                {
+                    foreach (var newTask in taskBatch.TasksToCreate)
+                    {
+                        Tasks task = new Tasks
+                        {
+                            Completed = newTask.Completed,
+                            TaskDescription = newTask.TaskDescription,
+                            TodoKey = todoKey
+                        };
+                        try
+                        {
+                            _context.Add(task);
+                        }catch(Exception ex)
+                        {
+                            errors += " " + ex.Message + ";";
+                        }
+                    }
+                }
+                if(taskBatch.TasksToUpdate != null && taskBatch.TasksToUpdate.Count > 0)
+                {
+                    foreach (var task in taskBatch.TasksToUpdate)
+                    {
+                        try
+                        {
+                            var taskToUpdate = _context.Tasks.FirstOrDefault(x => x.TaskKey == task.TaskKey);
+                            if (taskToUpdate != null)
+                            {
+                                taskToUpdate.TaskDescription = task.TaskDescription;
+                                taskToUpdate.Completed = task.Completed ;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            errors += " " + ex.Message + ";";
+                        }
+                    }
+                }
+                try
+                {
+                    _context.SaveChanges();
+                }catch(Exception ex)
+                {
+                    errors += " " + ex.Message + ";";
+                }
+                if (errors.Length > 0)
+                    return StatusCode(StatusCodes.Status400BadRequest, errors);
+            }
+            return Ok();
+            
+        }
+
+        [HttpPost("[action]")]
+        public ActionResult CreateTodo([FromBody]Todos newTodoDetails)
+        {
+            var newTodo = new Todos
+            {
+                TodoListName = newTodoDetails.TodoListName
+            };
+
+            _context.Todos.Add(newTodo);
+
+            try
+            {
+                _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status409Conflict, ex.Message);
+            }
+
+            return Ok(newTodo.TodoKey);
+        }
+
+        [HttpDelete("[action]")]
+        public ActionResult DeleteTodo(int todoKey)
+        {
+            var tasksForTodoToDelete = _context.Tasks.Where(x => x.TodoKey == todoKey).ToList();
+            foreach(var task in tasksForTodoToDelete)
+            {
+                _context.Remove(task);
+            }
+
+            var todoToDelete = _context.Todos.FirstOrDefault(x => x.TodoKey == todoKey);
+
+            if(todoToDelete != null)
+            {
+                _context.Remove(todoToDelete);
+            }
+
+            try
+            {
+                _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, ex.Message);
+            }
+
+            return Ok();
+        }
+
+
+
+        #region unimplemented methods
+
+
 
         // GET: Todo/Edit/5
         public ActionResult Edit(int id)
@@ -111,17 +218,13 @@ namespace Todo.Controllers
 
     }
 
-    public class Todo
+    public class TasksBatch
     {
-        public int todoKey { get; set; }
-        public string name { get; set; }
-    }
-
-    public class TodoTask
-    {
-        public int TaskKey { get; set; }
-        public int TodoKey { get; set; }
-        public string TaskName { get; set; }
-        public bool Completed { get; set; }
+        public List<Tasks>TasksToUpdate { get; set; }
+        public List<Tasks> TasksToCreate { get; set; }
+        public List<int> TasksKeysToDelete { get; set; }
     }
 }
+
+
+

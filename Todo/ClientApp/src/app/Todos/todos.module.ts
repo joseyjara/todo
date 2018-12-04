@@ -2,7 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute } from '@angular/router';
-import { DxDataGridModule, DxButtonModule } from 'devextreme-angular';
+import { DxDataGridModule, DxButtonModule, DxToastModule } from 'devextreme-angular';
 import { TodoDetailsComponent } from './todo-details.component';
 import { TodoListComponent } from './todo-list.component';
 import { CommonModule } from '@angular/common';
@@ -15,6 +15,7 @@ import { CommonModule } from '@angular/common';
   imports: [
     DxDataGridModule,
     DxButtonModule,
+    DxToastModule,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
@@ -29,10 +30,6 @@ import { CommonModule } from '@angular/common';
   bootstrap: []
 })
 export class TodosModule {
-  //todoKey = 0;
-  //constructor(private route: ActivatedRoute) {
-  //  this.route.params.subscribe(params => this.todoKey = params['todoKey']);
-  //}
 }
 
 

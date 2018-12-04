@@ -1,22 +1,30 @@
 <div>
-  <h1>Todos!</h1>
+  <h1>To-dos!</h1>
 </div>
 
 <div>
-  <button class="btn btn-primary" (click)="createNewTodo()">Add new Todo</button>
+  <button class="btn btn-primary" (click)="createNewTodo()">Add new To-do list</button>
   <dx-data-grid [dataSource]="todosList"
                 keyExpr="todoKey"
                 [searchPanel]="{visible: true}"
                 [showColumnLines]="true"
                 [showRowLines]="true"
                 [hoverStateEnabled]="true"
-                (onRowClick)="editTodo($event)">
+                (onRowClick)="editTodo($event)"
+                (onRowRemoving)="deletingTask($event)"
+                (onRowRemoved)=deleteTask($event)>
     <dxo-editing mode="row"
                  [allowDeleting]="true"
                  [useIcons]="true">
-
+      <dxo-texts confirmDeleteMessage="Are you sure you want to delete this Todo? All tasks in it will be lost!"></dxo-texts>
     </dxo-editing>
-    <dxi-column alignment="left" dataType="string" dataField="name" caption="Todo Name"></dxi-column>
+    <dxi-column alignment="left" dataType="string" dataField="todoListName" caption="Todo Name"></dxi-column>
   </dx-data-grid>
 </div>
-<router-outlet></router-outlet>
+
+<dx-toast message="Todo deleted successfully"
+          type="success"
+          [displayTime]="3000"
+          [(visible)]="isToastVisible">
+</dx-toast>
+<!--<router-outlet></router-outlet>-->
